@@ -3,9 +3,9 @@ import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { DataGrid } from '@mui/x-data-grid';
-import CitiesDropDownComponent from './CitiesDropDown';
-import AddessesDropDown from './AddressesDropDown';
+import DropDown from '../Common_Components/DropDown';
 import SearchText from './SearchText';
+import {generateMappedRows} from '../utils';
 
 const columns = [
     { field: 'store_id', headerName: 'ID', width: 90 },
@@ -71,7 +71,7 @@ export default function BranchesList() {
         setBranchesList(branches);
         const regionAdresses = branches.filter((branch) => branch.store_region === selectedRegion);
         setAdressesList(regionAdresses);
-        generateMappedRows(branches);
+        setBranchesList(generateMappedRows(branches));
     }, [])
 
 
@@ -84,13 +84,13 @@ export default function BranchesList() {
         });
         setAdressesList(addressesOptions);
         const mappedBranchesByRegion = branches && branches.filter((branch) => branch.store_region === selectedBranch.store_region);
-        generateMappedRows(mappedBranchesByRegion);
+        setBranchesList(generateMappedRows(mappedBranchesByRegion));
     }
 
     const handleSelectAdress = (selectedBranch) => {
         setSelectedZipCode(selectedBranch.zip_code);
         const mappedBranchesByZipCode = branches && branches.filter((branch) => branch.zip_code === selectedBranch.zip_code);
-        generateMappedRows(mappedBranchesByZipCode);
+        setBranchesList(generateMappedRows(mappedBranchesByZipCode));
     }
     const handleSearchText = (searchText) => {
         setSearchText(searchText);
@@ -99,25 +99,15 @@ export default function BranchesList() {
         // search only on the stores include the text and in the same area as selected
         if (selectedZipCode && selectedRegion) {
             const mappedData = mappedSearch && mappedSearch.filter((branch) => branch.zip_code === selectedZipCode && branch.store_region === selectedRegion);
-            generateMappedRows(mappedData);
+            setBranchesList(generateMappedRows(mappedData));
         } else if (selectedZipCode || selectedRegion) {
             const mappedData = mappedSearch && mappedSearch.filter((branch) => branch.zip_code === selectedZipCode || branch.store_region === selectedRegion);
-            generateMappedRows(mappedData);
+            setBranchesList(generateMappedRows(mappedData));
         } else {
-            generateMappedRows(mappedSearch);
+            setBranchesList(generateMappedRows(mappedSearch));
         }
     }
 
-    // generate new id field caused MUI table is required unique id field for each row 
-    const generateMappedRows = (list) => {
-        const rows = list && list.map((branch) => {
-            return {
-                id: branch.store_id.toString(),
-                ...branch
-            }
-        });
-        setBranchesList(rows);
-    }
 
 
     return (
@@ -125,11 +115,11 @@ export default function BranchesList() {
             <Grid container spacing={{ xs: 2, md: 4 }}>
                 {citiesList &&
                     <Grid >
-                        <CitiesDropDownComponent label="Cities" options={citiesList} handleSelectionRegion={handleSelectRegion} />
+                        <DropDown label="Cities" options={citiesList} handleSelect={handleSelectRegion} />
                     </Grid>}
                 {adressesList &&
                     <Grid >
-                        <AddessesDropDown label="Adresses" options={adressesList} handleSelectAdress={handleSelectAdress} />
+                        <DropDown label="Adresses" options={adressesList} handleSelect={handleSelectAdress} />
                     </Grid>}
                 <Grid>
                     <SearchText handleSearch={handleSearchText} />

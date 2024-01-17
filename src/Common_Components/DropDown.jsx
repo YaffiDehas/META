@@ -4,10 +4,10 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-export default function AddessesDropDown({ label, options, handleSelectAdress }) {
+export default function DropDown({ label, options, handleSelect }) {
 
     const handleChange = (event: SelectChangeEvent) => {
-        handleSelectAdress(event.target.value)
+        handleSelect(event.target.value)
     };
 
     return (
@@ -21,7 +21,7 @@ export default function AddessesDropDown({ label, options, handleSelectAdress })
                 label={label}
             >
                 {options.map((option, index) => {
-                    return <MenuItem key={index} value={option}>{option.store_address}</MenuItem>
+                    return <MenuItem key={index} value={option}>{label ==="Cities"? option.city :option.store_address}</MenuItem>
                 })}
             </Select>
         </FormControl>

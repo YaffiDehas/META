@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
 import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
-import TimelineIcon from '@mui/icons-material/Timeline';
 import { DataGrid } from '@mui/x-data-grid';
 import CitiesDropDownComponent from './CitiesDropDown';
 import AddessesDropDown from './AddressesDropDown';
 import SearchText from './SearchText';
+
 const columns = [
     { field: 'store_id', headerName: 'ID', width: 90 },
     {
@@ -56,21 +55,9 @@ const columns = [
 
 export default function BranchesList() {
     const branches = useSelector((state) => state.stores.branches);
-    const rows = branches.length && branches.map((branch, index) => {
-        return {
-            id: index.toString(),
-            store_id: branch.store_id.toString(),
-            store_title: branch.store_title,
-            store_address: branch.store_address,
-            store_phone: branch.store_phone,
-            city: branch.city,
-            zip_code: branch.zip_code,
-            emp_interview: branch.emp_interview,
-            emp_contact: branch.emp_contact
-        }
-    });
     const [selectedRegion, setSelectedRegion] = useState("1");
     const [selectedZipCode, setSelectedZipCode] = useState("");
+    const [searchText, setSearchText] = useState("");
     const [citiesList, setCitiesList] = useState("");
     const [adressesList, setAdressesList] = useState("");
     const [branchesList, setBranchesList] = useState("");
@@ -82,9 +69,9 @@ export default function BranchesList() {
         });
         setCitiesList(citiesOptions);
         setBranchesList(branches);
-        generateMappedRows();
         const regionAdresses = branches.filter((branch) => branch.store_region === selectedRegion);
         setAdressesList(regionAdresses);
+        generateMappedRows(branches);
     }, [])
 
 
@@ -96,64 +83,40 @@ export default function BranchesList() {
             return regionAdresses.find(item => item.zip_code === zip_code);
         });
         setAdressesList(addressesOptions);
-        const mappedRegion = branches && branches.filter((branch) => branch.store_region === selectedBranch.store_region);
-        const rows = mappedRegion && mappedRegion.map((branch, index) => {
-            return {
-                id: branch.store_id.toString(),
-                ...branch
-            }
-        });
-        setBranchesList(rows);
+        const mappedBranchesByRegion = branches && branches.filter((branch) => branch.store_region === selectedBranch.store_region);
+        generateMappedRows(mappedBranchesByRegion);
     }
 
     const handleSelectAdress = (selectedBranch) => {
         setSelectedZipCode(selectedBranch.zip_code);
-        const branchesList = branches.filter((branch) => branch.zip_code === selectedBranch.zip_code);
-        setBranchesList(branchesList);
-        const mappedZipCode = branches && branches.filter((branch) => branch.zip_code === selectedBranch.zip_code);
-        const rows = mappedZipCode && mappedZipCode.map((branch, index) => {
-            return {
-                id: branch.store_id.toString(),
-                ...branch
-            }
-        });
-        setBranchesList(rows);
+        const mappedBranchesByZipCode = branches && branches.filter((branch) => branch.zip_code === selectedBranch.zip_code);
+        generateMappedRows(mappedBranchesByZipCode);
     }
-
-
-    // generate new id field caused MUI table is required unique id field for each row 
-    const generateMappedRows = () => {
-        const rows = branches && branches.map((branch, index) => {
-            return {
-                id: branch.store_id.toString(),
-                ...branch
-            }
-        });
-        setBranchesList(rows);
-    }
-
     const handleSearchText = (searchText) => {
+        setSearchText(searchText);
         // search only the stores include the text
         const mappedSearch = branches && branches.filter((branch) => branch.zip_code.includes(searchText) || branch.store_title.includes(searchText) || branch.store_address.includes(searchText));
         // search only on the stores include the text and in the same area as selected
-        if (selectedZipCode || selectedRegion) {
+        if (selectedZipCode && selectedRegion) {
+            const mappedData = mappedSearch && mappedSearch.filter((branch) => branch.zip_code === selectedZipCode && branch.store_region === selectedRegion);
+            generateMappedRows(mappedData);
+        } else if (selectedZipCode || selectedRegion) {
             const mappedData = mappedSearch && mappedSearch.filter((branch) => branch.zip_code === selectedZipCode || branch.store_region === selectedRegion);
-            const rows = mappedData && mappedData.map((branch, index) => {
-                return {
-                    id: index.toString(),
-                    ...branch
-                }
-            });
-            setBranchesList(rows);
+            generateMappedRows(mappedData);
         } else {
-            const rows = mappedSearch && mappedSearch.map((branch, index) => {
-                return {
-                    id: index.toString(),
-                    ...branch
-                }
-            });
-            setBranchesList(rows);
+            generateMappedRows(mappedSearch);
         }
+    }
+
+    // generate new id field caused MUI table is required unique id field for each row 
+    const generateMappedRows = (list) => {
+        const rows = list && list.map((branch) => {
+            return {
+                id: branch.store_id.toString(),
+                ...branch
+            }
+        });
+        setBranchesList(rows);
     }
 
 

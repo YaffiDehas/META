@@ -76,6 +76,7 @@ export default function BranchesList() {
     const [branchesList, setBranchesList] = useState("");
 
     useEffect(() => {
+        // Use Set to avoid duplicate cities.
         const citiesOptions = Array.from(new Set(branches.map(item => item.city))).map(city => {
             return branches.find(item => item.city === city);
         });
@@ -84,13 +85,13 @@ export default function BranchesList() {
         generateMappedRows();
         const regionAdresses = branches.filter((branch) => branch.store_region === selectedRegion);
         setAdressesList(regionAdresses);
-        console.log(regionAdresses);
     }, [])
 
 
     const handleSelectRegion = (selectedBranch) => {
         setSelectedRegion(selectedBranch.store_region);
         const regionAdresses = branches.filter((branch) => branch.store_region === selectedBranch.store_region);
+        // Use Set to avoid duplicate addresses.
         const addressesOptions = Array.from(new Set(regionAdresses.map(item => item.zip_code))).map(zip_code => {
             return regionAdresses.find(item => item.zip_code === zip_code);
         });

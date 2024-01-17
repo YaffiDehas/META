@@ -21,7 +21,7 @@ export default function DropDown({ label, options, handleSelect }) {
                 label={label}
             >
                 {options.map((option, index) => {
-                    return <MenuItem key={index} value={option}>{label ==="Cities"? option.city :option.store_address}</MenuItem>
+                    return <MenuItem key={index} value={option}>{label === "Cities" ? option.city : option.store_address}</MenuItem>
                 })}
             </Select>
         </FormControl>

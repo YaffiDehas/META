@@ -5,7 +5,7 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import { DataGrid } from '@mui/x-data-grid';
 import DropDown from '../Common_Components/DropDown';
 import SearchText from './SearchText';
-import {generateMappedRows} from '../utils';
+import { generateMappedRows } from '../utils';
 
 const columns = [
     { field: 'store_id', headerName: 'ID', width: 90 },
@@ -57,7 +57,6 @@ export default function BranchesList() {
     const branches = useSelector((state) => state.stores.branches);
     const [selectedRegion, setSelectedRegion] = useState("1");
     const [selectedZipCode, setSelectedZipCode] = useState("");
-    const [searchText, setSearchText] = useState("");
     const [citiesList, setCitiesList] = useState("");
     const [adressesList, setAdressesList] = useState("");
     const [branchesList, setBranchesList] = useState("");
@@ -93,7 +92,6 @@ export default function BranchesList() {
         setBranchesList(generateMappedRows(mappedBranchesByZipCode));
     }
     const handleSearchText = (searchText) => {
-        setSearchText(searchText);
         // search only the stores include the text
         const mappedSearch = branches && branches.filter((branch) => branch.zip_code.includes(searchText) || branch.store_title.includes(searchText) || branch.store_address.includes(searchText));
         // search only on the stores include the text and in the same area as selected
